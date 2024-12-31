@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Todo } from '../types/Todo';
 import classNames from 'classnames';
 type Props = {
@@ -7,6 +7,9 @@ type Props = {
   clearCompleted: () => void;
   setError: (message: string) => void;
   showError: (message: string) => void;
+  loading: number | null;
+  title: string;
+  setTitle: (title: string) => void;
 };
 
 export const Header: React.FC<Props> = ({
@@ -15,12 +18,17 @@ export const Header: React.FC<Props> = ({
   clearCompleted,
   setError,
   showError,
+  loading,
+  title,
+  setTitle,
 }) => {
   const allTodoCompleted = todos.every(todo => todo.completed);
-  const [title, setTitle] = React.useState('');
+
+  const focus = useRef<HTMLInputElement>(null);
+  // const [focus, setFocus] = React.useState('');
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value.trim());
+    setTitle(event.target.value);
     setError('');
   };
 
@@ -34,8 +42,13 @@ export const Header: React.FC<Props> = ({
     }
 
     addTodo(title);
-    setTitle('');
   };
+
+  useEffect(() => {
+    if (loading === 0) {
+      focus.current?.focus();
+    }
+  }, [loading]);
 
   return (
     <header className="todoapp__header">
@@ -58,7 +71,8 @@ export const Header: React.FC<Props> = ({
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
           onChange={handleInput}
-          autoFocus
+          disabled={loading !== 0}
+          ref={focus}
         />
       </form>
     </header>

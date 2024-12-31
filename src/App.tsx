@@ -18,10 +18,12 @@ import { TodoList } from './components/TodoList';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = React.useState<Todo[]>([]);
+  const [tempTodo, setTempTodo] = React.useState<Todo | null>(null);
   const [filter, setFilter] = React.useState<'all' | 'active' | 'completed'>(
     'all',
   );
   const [error, setError] = React.useState('');
+  const [title, setTitle] = React.useState('');
   const [loading, setLoading] = React.useState<number | null>(null);
   const showError = (message: string) => {
     setError(message);
@@ -42,18 +44,26 @@ export const App: React.FC = () => {
     return <UserWarning />;
   }
 
-  const addTodo = (title: string) => {
+  const addTodo = (todoTitle: string) => {
     setLoading(1);
+    setTempTodo({
+      id: 0,
+      userId: 2215,
+      title: todoTitle,
+      completed: false,
+    });
 
     // Add a new todo
     postTodo(title.trim())
       .then((newTodo: Todo) => {
         setTodos(prevTodos => [...prevTodos, newTodo]);
         setError('');
+        setTitle('');
       })
       .catch(() => showError('Unable to add a todo'))
       .finally(() => {
         setLoading(0);
+        setTempTodo(null);
       });
   };
 
@@ -137,15 +147,21 @@ export const App: React.FC = () => {
 
   const clearCompleted = () => {
     const todosCompleted = todos.filter(todo => todo.completed);
+    const successIds: number[] = [];
 
     Promise.all(
       todosCompleted.map(todo => {
         setLoading(todo.id);
-        removeTodo(todo.id);
+
+        return removeTodo(todo.id)
+          .then(() => successIds.push(todo.id))
+          .catch(() => showError('Unable to delete a todo'));
       }),
     )
-      .then(() => setTodos(todos.filter(todo => !todo.completed)))
-      .catch(() => showError('Error'))
+      .then(() => {
+        setTodos(todos.filter(todo => !successIds.includes(todo.id)));
+      })
+      .catch(() => showError('Unable to delete a todo'))
       .finally(() => setLoading(0));
   };
 
@@ -162,6 +178,9 @@ export const App: React.FC = () => {
           clearCompleted={clearCompleted}
           setError={setError}
           showError={showError}
+          loading={loading}
+          title={title}
+          setTitle={setTitle}
         />
 
         <TodoList
@@ -171,6 +190,7 @@ export const App: React.FC = () => {
           deleteTodo={deleteTodo}
           updateTodoCheck={updateTodoCheck}
           updateTodoTitle={updateTodoTitle}
+          tempTodo={tempTodo}
         />
 
         {todos.length > 0 && (

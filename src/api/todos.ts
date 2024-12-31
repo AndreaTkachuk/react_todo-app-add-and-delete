@@ -9,12 +9,12 @@ export const getTodos = () => {
 
 export const postTodo = (value: string) => {
   const newTodo = {
-    userId: USER_ID,
+    // userId: USER_ID,
     title: value,
     completed: false,
   };
 
-  return client.post<Todo>(`/todos?userId=${USER_ID}`, newTodo);
+  return client.post<Todo>(`/todos`, { ...newTodo, userId: USER_ID });
 };
 
 export const renewTodo = (id: number, updatedTodo: Todo) => {
