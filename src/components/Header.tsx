@@ -25,7 +25,6 @@ export const Header: React.FC<Props> = ({
   const allTodoCompleted = todos.every(todo => todo.completed);
 
   const focus = useRef<HTMLInputElement>(null);
-  // const [focus, setFocus] = React.useState('');
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);

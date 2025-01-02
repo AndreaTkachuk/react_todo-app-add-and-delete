@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserWarning } from './components/UserWarning';
 import {
   getTodos,
@@ -15,16 +15,17 @@ import { Footer } from './components/Footer';
 import { getFilteredItems } from './utils/getFilteredItems';
 import { Header } from './components/Header';
 import { TodoList } from './components/TodoList';
+import { Filter } from './utils/enamFilter';
 
 export const App: React.FC = () => {
-  const [todos, setTodos] = React.useState<Todo[]>([]);
-  const [tempTodo, setTempTodo] = React.useState<Todo | null>(null);
-  const [filter, setFilter] = React.useState<'all' | 'active' | 'completed'>(
-    'all',
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [tempTodo, setTempTodo] = useState<Todo | null>(null);
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>(
+    Filter.All,
   );
-  const [error, setError] = React.useState('');
-  const [title, setTitle] = React.useState('');
-  const [loading, setLoading] = React.useState<number | null>(null);
+  const [error, setError] = useState('');
+  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState<number | null>(null);
   const showError = (message: string) => {
     setError(message);
 
@@ -35,7 +36,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     getTodos()
-      .then(data => setTodos(data))
+      .then(setTodos)
       .catch(() => showError('Unable to load todos'))
       .finally(() => setLoading(0));
   }, []);

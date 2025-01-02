@@ -9,7 +9,6 @@ export const getTodos = () => {
 
 export const postTodo = (value: string) => {
   const newTodo = {
-    // userId: USER_ID,
     title: value,
     completed: false,
   };

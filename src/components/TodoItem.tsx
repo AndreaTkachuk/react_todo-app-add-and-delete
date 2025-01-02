@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Todo } from '../types/Todo';
 import classNames from 'classnames';
 
@@ -19,17 +19,17 @@ export const TodoItem: React.FC<Props> = ({
   updateTodoCheck,
   updateTodoTitle,
 }) => {
-  const [title, setTitle] = React.useState('');
-  const [isEditingId, setIsEditingId] = React.useState<number | null>(null);
+  const [title, setTitle] = useState('');
+  const [isEditingId, setIsEditingId] = useState<number | null>(null);
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
     setError('');
   };
 
-  const handleDoubleClick = (id: number, currentTitle: string) => {
-    setIsEditingId(id);
-    setTitle(currentTitle);
+  const handleDoubleClick = (objTodo: Todo) => {
+    setIsEditingId(objTodo.id);
+    setTitle(objTodo.title);
   };
 
   return (
@@ -78,7 +78,7 @@ export const TodoItem: React.FC<Props> = ({
         <span
           data-cy="TodoTitle"
           className="todo__title"
-          onDoubleClick={() => handleDoubleClick(todo.id, todo.title)}
+          onDoubleClick={() => handleDoubleClick({ ...todo })}
         >
           {todo.title}
         </span>
